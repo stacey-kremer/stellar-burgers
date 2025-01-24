@@ -18,12 +18,17 @@ export const constructorSlice = createSlice({
   initialState,
   reducers: {
     // Добавление ингредиента
-    addItem: (state, action: PayloadAction<TConstructorIngredient>) => {
-      if (action.payload.type === 'bun') {
-        state.bun = action.payload;
-      } else {
-        state.ingredients.push({ ...action.payload, id: uuidv4() });
-      }
+    addItem: {
+      reducer: (state, action: PayloadAction<TConstructorIngredient>) => {
+        if (action.payload.type === 'bun') {
+          state.bun = action.payload;
+        } else {
+          state.ingredients.push(action.payload);
+        }
+      },
+      prepare: (ingredient: TConstructorIngredient) => ({
+        payload: { ...ingredient, id: uuidv4() }
+      })
     },
     // Удаление ингредиента
     deleteItem: (state, action: PayloadAction<TConstructorIngredient>) => {
