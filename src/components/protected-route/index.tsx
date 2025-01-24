@@ -18,7 +18,7 @@ export const ProtectedRoute = ({
   if (!onlyUnAuth && !isAuthChecked) {
     return <Navigate replace to='/login' state={{ from: location }} />;
   }
-  // Проверка для маршрутов, доступных только для неавторизованных пользователей
+  // Проверкa для маршрутов, доступных только для неавторизованных пользователей
   if (onlyUnAuth && isAuthChecked) {
     const fromPage = location.state?.from || { pathname: '/' };
 
