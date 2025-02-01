@@ -1,25 +1,40 @@
 import { useState, useRef, useEffect, FC } from 'react';
 import { useInView } from 'react-intersection-observer';
-
 import { TTabMode } from '@utils-types';
-import { BurgerIngredientsUI } from '../ui/burger-ingredients';
+import { BurgerIngredientsUI } from '../ui/';
+import { useSelector } from '../../services/store';
+import {
+  selectIngredients,
+  selectLoading,
+  selectError
+} from '../../services/slices/IngredientStore';
+import { Preloader } from '../ui/preloader';
 
 export const BurgerIngredients: FC = () => {
-  /** TODO: взять переменные из стора */
-  const buns = [];
-  const mains = [];
-  const sauces = [];
+  const ingredients = useSelector(selectIngredients); // Используем правильный селектор
+  const loading = useSelector(selectLoading); // Используем правильный селектор
+  const error = useSelector(selectError); // Используем правильный селектор
+
+  // Классификация ингредиентов по типам (булочки, основные, соусы)
+  const categorizedIngredients = {
+    bun: ingredients.filter((ingredient) => ingredient.type === 'bun'),
+    main: ingredients.filter((ingredient) => ingredient.type === 'main'),
+    sauce: ingredients.filter((ingredient) => ingredient.type === 'sauce')
+  };
 
   const [currentTab, setCurrentTab] = useState<TTabMode>('bun');
-  const titleBunRef = useRef<HTMLHeadingElement>(null);
-  const titleMainRef = useRef<HTMLHeadingElement>(null);
-  const titleSaucesRef = useRef<HTMLHeadingElement>(null);
-
+  // Ссылки на заголовки секций, чтобы прокручивать их при переключении вкладок
+  const titleRefs = {
+    bun: useRef<HTMLHeadingElement>(null),
+    main: useRef<HTMLHeadingElement>(null),
+    sauce: useRef<HTMLHeadingElement>(null)
+  };
+  // Хуки для отслеживания видимости каждой категории ингредиентов
   const [bunsRef, inViewBuns] = useInView({
     threshold: 0
   });
 
-  const [mainsRef, inViewFilling] = useInView({
+  const [mainsRef, inViewMains] = useInView({
     threshold: 0
   });
 
@@ -27,41 +42,44 @@ export const BurgerIngredients: FC = () => {
     threshold: 0
   });
 
+  // Эффект для смены вкладки в зависимости от того, какая категория ингредиентов видна
   useEffect(() => {
     if (inViewBuns) {
       setCurrentTab('bun');
     } else if (inViewSauces) {
       setCurrentTab('sauce');
-    } else if (inViewFilling) {
+    } else if (inViewMains) {
       setCurrentTab('main');
     }
-  }, [inViewBuns, inViewFilling, inViewSauces]);
+  }, [inViewBuns, inViewMains, inViewSauces]);
 
-  const onTabClick = (tab: string) => {
-    setCurrentTab(tab as TTabMode);
-    if (tab === 'bun')
-      titleBunRef.current?.scrollIntoView({ behavior: 'smooth' });
-    if (tab === 'main')
-      titleMainRef.current?.scrollIntoView({ behavior: 'smooth' });
-    if (tab === 'sauce')
-      titleSaucesRef.current?.scrollIntoView({ behavior: 'smooth' });
+  // Обработчик клика по вкладке
+  const onTabClick = (tab: TTabMode) => {
+    setCurrentTab(tab);
+    titleRefs[tab].current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  return null;
+  if (error) {
+    return <p>Упс... что-то пошло не так...</p>;
+  }
+
+  if (loading) {
+    return <Preloader />;
+  }
 
   return (
     <BurgerIngredientsUI
       currentTab={currentTab}
-      buns={buns}
-      mains={mains}
-      sauces={sauces}
-      titleBunRef={titleBunRef}
-      titleMainRef={titleMainRef}
-      titleSaucesRef={titleSaucesRef}
+      buns={categorizedIngredients.bun}
+      mains={categorizedIngredients.main}
+      sauces={categorizedIngredients.sauce}
+      titleBunRef={titleRefs.bun}
+      titleMainRef={titleRefs.main}
+      titleSaucesRef={titleRefs.sauce}
       bunsRef={bunsRef}
       mainsRef={mainsRef}
       saucesRef={saucesRef}
-      onTabClick={onTabClick}
+      onTabClick={(tab: string) => onTabClick(tab as TTabMode)}
     />
   );
 };

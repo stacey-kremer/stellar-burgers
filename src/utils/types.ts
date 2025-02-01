@@ -10,6 +10,7 @@ export type TIngredient = {
   image: string;
   image_large: string;
   image_mobile: string;
+  [key: string]: any;
 };
 
 export type TConstructorIngredient = TIngredient & {
@@ -38,3 +39,22 @@ export type TUser = {
 };
 
 export type TTabMode = 'bun' | 'sauce' | 'main';
+
+export interface TFeedsResponse {
+  orders: TOrder[];
+  total: number;
+  totalToday: number;
+}
+
+export interface TNewOrderResponse {
+  _id: string;
+  id: string;
+  ingredients: string;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface TError {
+  message: string;
+}
