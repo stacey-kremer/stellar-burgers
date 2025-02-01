@@ -4,13 +4,13 @@ import { OrderCardProps } from './type';
 import { TIngredient } from '@utils-types';
 import { OrderCardUI } from '../ui/order-card';
 import { useSelector } from '../../services/store';
-import { getIngredients } from '../../services/slices/IngredientStore';
+import { selectIngredients } from '../../services/slices/IngredientStore'; // Используем правильный селектор
 
 const maxIngredients = 6; // Максимальное количество ингредиентов, которое будет отображаться в карточке заказа
 
 export const OrderCard: FC<OrderCardProps> = memo(({ order }) => {
   const location = useLocation();
-  const ingredients: TIngredient[] = useSelector(getIngredients);
+  const ingredients: TIngredient[] = useSelector(selectIngredients); // Используем правильный селектор
   // Мемоизируем отображение ингредиентов, создавая объект, где ключом является _id ингредиента
   const ingredientsMap = useMemo(
     () =>

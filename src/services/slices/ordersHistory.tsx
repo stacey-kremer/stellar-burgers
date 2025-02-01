@@ -1,5 +1,5 @@
-import { getOrdersApi } from '@api';
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import { getOrdersApi } from '@api';
 import { TOrder } from '@utils-types';
 
 // Создаем асинхронное действие для получения заказов пользователя

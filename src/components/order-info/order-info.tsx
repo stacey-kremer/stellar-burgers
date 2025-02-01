@@ -5,13 +5,13 @@ import { Preloader } from '../ui/preloader';
 import { OrderInfoUI } from '../ui/order-info';
 import { TIngredient, TOrder } from '@utils-types';
 import { useSelector } from '../../services/store';
-import { getIngredients } from '../../services/slices/IngredientStore';
+import { selectIngredients } from '../../services/slices/IngredientStore'; // Используем правильный селектор
 
 // Компонент для отображения информации о заказе
 export const OrderInfo: FC = () => {
   const [orderData, setOrderData] = useState<TOrder | null>(null);
   const { number } = useParams();
-  const ingredients: TIngredient[] = useSelector(getIngredients);
+  const ingredients: TIngredient[] = useSelector(selectIngredients); // Используем правильный селектор
   // Мемоизируем информацию о заказе, включая ингредиенты и общую стоимость
   const orderInfo = useMemo(() => {
     if (!orderData || !ingredients.length) return null;
