@@ -1,6 +1,9 @@
 import { URL } from '../../src/utils/burger-api';
 import { deleteCookie, setCookie } from '../../src/utils/cookie';
 
+// Вынесение URL в константу
+const testUrl = 'http://localhost:4001';
+
 describe('Тест конструктора бургеров', () => {
   // Запуск перед каждым тестом
   beforeEach(() => {
@@ -15,14 +18,15 @@ describe('Тест конструктора бургеров', () => {
       '9cbdd5b777edfb92bd9183a7cf2372a12b545c045a9796f94c1afd0b9d374a8794aa15bee20a7556'
     );
     // Мокаю запросы к API (авторизация и ингредиенты)
-    cy.intercept('GET', `${URL}//auth/user`, { fixture: 'user.json' }).as(
+    cy.intercept('GET', `${URL}/auth/user`, { fixture: 'user.json' }).as(
       'getUser'
     );
     cy.intercept('GET', `${URL}/ingredients`, {
       fixture: 'ingredients.json'
     }).as('getIngredients');
     // Открываю главную страницу приложения
-    cy.visit('http://localhost:4000/');
+    cy.visit(testUrl); // Используем testUrl вместо строки URL
+
     // Ожидаю ответа на запрос о пользователе
     cy.wait('@getUser');
   });
@@ -73,10 +77,11 @@ describe('Тест конструктора бургеров', () => {
   });
 
   it('Тест создания заказа', () => {
-    // Мокаю запрос на создание заказа
-    cy.intercept('POST', `${URL}/orders`, { fixture: 'order.json' }).as(
-      'orderBurgerApi'
-    );
+    // Перехватываю запрос на создание заказа
+    cy.intercept('POST', `${URL}/orders`, (req) => {
+      // Мокаю успешный ответ с нужным номером заказа
+      req.reply({ fixture: 'order.json' });
+    }).as('orderBurgerApi');
 
     cy.get('[data-cy="constructor"]').as('constructor');
 
@@ -104,6 +109,20 @@ describe('Тест конструктора бургеров', () => {
     cy.get('@constructor').should('not.contain', 'Краторная булка N-200i');
 
     // Ожидаю завершения запроса на создание заказа
-    cy.wait('@orderBurgerApi');
+    cy.wait('@orderBurgerApi').then((interception) => {
+      // Убедимся, что ответ существует, прежде чем продолжать
+      if (interception.response) {
+        // Проверка, что в ответе есть свойство 'order'
+        cy.wrap(interception.response.body).should('have.property', 'order');
+      } else {
+        // Если ответа нет, выкидываем ошибку
+        throw new Error('Ответ на запрос не получен');
+      }
+
+      // Проверка данных в запросе
+      const { body } = interception.request;
+      // Проверка, что ingredients — это массив
+      cy.wrap(body.ingredients).should('be.an', 'array');
+    });
   });
 });
