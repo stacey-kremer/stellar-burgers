@@ -8,10 +8,23 @@ export const getIngredientsList = createAsyncThunk(
   getIngredientsApi
 );
 
+export const fetchIngredients = createAsyncThunk(
+  'ingredients/fetchIngredients',
+  async (_, { dispatch, getState }) => {
+    const response = await fetch('API_URL');
+    return response.json();
+  }
+);
+
+// В файле `IngredientStore`
+export const getIngredientsErrorState = (state: {
+  ingredients: { error: any };
+}) => state.ingredients.error;
+
 type TIngredientsState = {
   ingredients: Array<TIngredient>;
   loading: boolean;
-  error: string | null | undefined;
+  error: string | null;
 };
 
 const initialState: TIngredientsState = {
@@ -25,11 +38,6 @@ export const ingredientsSlice = createSlice({
   name: 'ingredients',
   initialState,
   reducers: {},
-  selectors: {
-    getIngredientsState: (state) => state,
-    getIngredientsLoadingState: (state) => state.loading,
-    getIngredients: (state) => state.ingredients
-  },
   // Обработчики для асинхронных действий
   extraReducers: (builder) => {
     builder
@@ -39,7 +47,7 @@ export const ingredientsSlice = createSlice({
       })
       .addCase(getIngredientsList.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message;
+        state.error = action.error.message ?? 'Unknown error'; // если ошибка без message
       })
       .addCase(getIngredientsList.fulfilled, (state, action) => {
         state.loading = false;
@@ -48,8 +56,11 @@ export const ingredientsSlice = createSlice({
   }
 });
 
-export const {
-  getIngredientsState,
-  getIngredientsLoadingState,
-  getIngredients
-} = ingredientsSlice.selectors;
+export const selectIngredients = (state: { ingredients: TIngredientsState }) =>
+  state.ingredients.ingredients;
+export const selectLoading = (state: { ingredients: TIngredientsState }) =>
+  state.ingredients.loading;
+export const selectError = (state: { ingredients: TIngredientsState }) =>
+  state.ingredients.error;
+
+export default ingredientsSlice.reducer;

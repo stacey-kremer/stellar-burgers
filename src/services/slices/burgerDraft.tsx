@@ -27,14 +27,19 @@ export const constructorSlice = createSlice({
         }
       },
       prepare: (ingredient: TConstructorIngredient) => ({
-        payload: { ...ingredient, id: uuidv4() }
+        payload: { ...ingredient, id: uuidv4() } // Генерация уникального id
       })
     },
     // Удаление ингредиента
     deleteItem: (state, action: PayloadAction<TConstructorIngredient>) => {
+      // Удаляем из ingredients
       state.ingredients = state.ingredients.filter(
         (item) => item.id !== action.payload.id
       );
+    },
+    // Удаление булки
+    deleteBun: (state) => {
+      state.bun = null; // Удаляем булку
     },
     // Очистка всех ингредиентов и булочек
     clearAll: (state) => {
@@ -48,7 +53,7 @@ export const constructorSlice = createSlice({
   }
 });
 
-export const { addItem, deleteItem, clearAll, updateAll } =
+export const { addItem, deleteItem, clearAll, updateAll, deleteBun } =
   constructorSlice.actions;
 
 export const selectBun = (state: {

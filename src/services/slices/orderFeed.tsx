@@ -13,7 +13,7 @@ export interface TFeedsState {
   total: number;
   totalToday: number;
   isLoading: boolean;
-  error: string | undefined;
+  error: string | null; // Используем null вместо undefined для более явного состояния
 }
 
 const initialState: TFeedsState = {
@@ -21,7 +21,7 @@ const initialState: TFeedsState = {
   total: 0,
   totalToday: 0,
   isLoading: false,
-  error: undefined
+  error: null // Инициализируем error как null
 };
 
 // Слайс для управления состоянием заказов
@@ -29,7 +29,6 @@ export const feedsSlice = createSlice({
   name: 'feeds',
   initialState,
   reducers: {},
-  // Обработчики для асинхронного действия
   extraReducers: (builder) => {
     builder
       .addCase(getAllFeeds.fulfilled, (state, action) => {
@@ -37,19 +36,20 @@ export const feedsSlice = createSlice({
         state.total = action.payload.total;
         state.totalToday = action.payload.totalToday;
         state.isLoading = false;
-        state.error = undefined;
+        state.error = null; // После успешного выполнения очищаем ошибку
       })
       .addCase(getAllFeeds.rejected, (state, action) => {
         state.orders = [];
         state.total = 0;
         state.totalToday = 0;
         state.isLoading = false;
+        // Переходим на использование null, если нет сообщения об ошибке
         state.error =
           action.error.message || 'Произошла ошибка при загрузке данных';
       })
       .addCase(getAllFeeds.pending, (state) => {
         state.isLoading = true;
-        state.error = undefined;
+        state.error = null; // Устанавливаем error в null на время запроса
       });
   }
 });
@@ -59,4 +59,5 @@ export const selectOrders = (state: { feeds: TFeedsState }) =>
 export const selectTotal = (state: { feeds: TFeedsState }) => state.feeds.total;
 export const selectTotalToday = (state: { feeds: TFeedsState }) =>
   state.feeds.totalToday;
+
 export default feedsSlice.reducer;
