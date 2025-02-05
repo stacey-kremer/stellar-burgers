@@ -2,7 +2,7 @@ import { URL } from '../../src/utils/burger-api';
 import { deleteCookie, setCookie } from '../../src/utils/cookie';
 
 // Вынесение URL в константу
-const testUrl = 'http://localhost:4001';
+const testUrl = 'http://localhost:4000';
 
 describe('Тест конструктора бургеров', () => {
   // Запуск перед каждым тестом
