@@ -27,11 +27,6 @@ export const newOrderSlice = createSlice({
   reducers: {
     resetOrder: () => initialState
   },
-  selectors: {
-    getOrderRequest: (state) => state.orderRequest,
-    getOrderModalData: (state) => state.orderModalData
-  },
-  // Обработчики для асинхронных действий
   extraReducers: (builder) => {
     builder
       .addCase(placeNewOrder.fulfilled, (state, action) => {
@@ -41,7 +36,7 @@ export const newOrderSlice = createSlice({
       })
       .addCase(placeNewOrder.rejected, (state, action) => {
         state.orderRequest = false;
-        state.error = action.payload as string;
+        state.error = action.error.message || 'Неизвестная ошибка';
       })
       .addCase(placeNewOrder.pending, (state) => {
         state.orderRequest = true;
@@ -50,7 +45,13 @@ export const newOrderSlice = createSlice({
   }
 });
 
+// Экспортируем редьюсер по умолчанию
 export const { resetOrder } = newOrderSlice.actions;
-export const { getOrderRequest, getOrderModalData } = newOrderSlice.selectors;
 
 export default newOrderSlice.reducer;
+
+// Селекторы отдельно
+export const getOrderRequest = (state: { newOrder: TNewOrderState }) =>
+  state.newOrder.orderRequest;
+export const getOrderModalData = (state: { newOrder: TNewOrderState }) =>
+  state.newOrder.orderModalData;

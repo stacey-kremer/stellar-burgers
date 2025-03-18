@@ -1,13 +1,20 @@
 import { useState, useRef, useEffect, FC } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { TTabMode } from '@utils-types';
-import { BurgerIngredientsUI } from '../ui/burger-ingredients';
+import { BurgerIngredientsUI } from '../ui/';
 import { useSelector } from '../../services/store';
-import { getIngredientsState } from '../../services/slices/IngredientStore';
+import {
+  selectIngredients,
+  selectLoading,
+  selectError
+} from '../../services/slices/IngredientStore';
 import { Preloader } from '../ui/preloader';
 
 export const BurgerIngredients: FC = () => {
-  const { ingredients, loading, error } = useSelector(getIngredientsState);
+  const ingredients = useSelector(selectIngredients); // Используем правильный селектор
+  const loading = useSelector(selectLoading); // Используем правильный селектор
+  const error = useSelector(selectError); // Используем правильный селектор
+
   // Классификация ингредиентов по типам (булочки, основные, соусы)
   const categorizedIngredients = {
     bun: ingredients.filter((ingredient) => ingredient.type === 'bun'),
@@ -45,6 +52,7 @@ export const BurgerIngredients: FC = () => {
       setCurrentTab('main');
     }
   }, [inViewBuns, inViewMains, inViewSauces]);
+
   // Обработчик клика по вкладке
   const onTabClick = (tab: TTabMode) => {
     setCurrentTab(tab);

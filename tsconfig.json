@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "ES6", // Изменено с ES5 на ES6
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
@@ -9,13 +9,13 @@
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
-    "module": "esnext",
+    "module": "ESNext", // Убедитесь, что используется ESNext
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": false,
     "jsx": "react-jsx",
-    "types": ["node", "jest"],
+    "types": ["node", "jest", "cypress"], // Убедитесь, что cypress добавлен
     "baseUrl": ".",
     "paths": {
       "@pages": ["src/pages"],
@@ -28,5 +28,9 @@
       "@selectors": ["src/services/selectors"]
     }
   },
-  "include": ["src"]
+  "include": [
+    "src",
+    "cypress/**/*.ts",
+    "cypress/**/*.tsx"
+  ]
 }
